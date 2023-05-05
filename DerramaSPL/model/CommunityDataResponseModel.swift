@@ -26,3 +26,15 @@ struct AddNeighbourModel: Codable {
   var comunidad: String
 }
 
+struct FoundDataNeighbourModel: Codable{
+  var _id: String
+  var _rev: String
+  var tabla: String
+  var piso: Int
+  var letra: String
+  var nombre: String
+  var telefono: Int
+  var comunidad: String
+  
+}
+

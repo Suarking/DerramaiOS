@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9F385E262A05F02A00A35484 /* Meetings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F385E252A05F02A00A35484 /* Meetings.swift */; };
+		9F3C3A372A06D91D000F2117 /* EditNeighbour.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3C3A362A06D91D000F2117 /* EditNeighbour.swift */; };
+		9F4F31132A041E69003C0170 /* Login.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4F31122A041E69003C0170 /* Login.swift */; };
+		9F4F31152A0425E0003C0170 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4F31142A0425E0003C0170 /* User.swift */; };
+		9F4F31172A042F42003C0170 /* Communities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4F31162A042F42003C0170 /* Communities.swift */; };
+		9F4F31192A043EE9003C0170 /* Neighbour.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F4F31182A043EE9003C0170 /* Neighbour.swift */; };
 		9F81E37129F92DD900F8CAB0 /* DerramaSPLApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F81E37029F92DD900F8CAB0 /* DerramaSPLApp.swift */; };
 		9F81E37329F92DDA00F8CAB0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F81E37229F92DDA00F8CAB0 /* ContentView.swift */; };
 		9F81E37529F92DDC00F8CAB0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9F81E37429F92DDC00F8CAB0 /* Assets.xcassets */; };
@@ -17,6 +23,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9F385E252A05F02A00A35484 /* Meetings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meetings.swift; sourceTree = "<group>"; };
+		9F3C3A362A06D91D000F2117 /* EditNeighbour.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditNeighbour.swift; sourceTree = "<group>"; };
+		9F4F31122A041E69003C0170 /* Login.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Login.swift; sourceTree = "<group>"; };
+		9F4F31142A0425E0003C0170 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		9F4F31162A042F42003C0170 /* Communities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Communities.swift; sourceTree = "<group>"; };
+		9F4F31182A043EE9003C0170 /* Neighbour.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Neighbour.swift; sourceTree = "<group>"; };
 		9F81E36D29F92DD900F8CAB0 /* DerramaSPL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DerramaSPL.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9F81E37029F92DD900F8CAB0 /* DerramaSPLApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DerramaSPLApp.swift; sourceTree = "<group>"; };
 		9F81E37229F92DDA00F8CAB0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -96,6 +108,12 @@
 			isa = PBXGroup;
 			children = (
 				9F81E37229F92DDA00F8CAB0 /* ContentView.swift */,
+				9F385E252A05F02A00A35484 /* Meetings.swift */,
+				9F4F31182A043EE9003C0170 /* Neighbour.swift */,
+				9F4F31122A041E69003C0170 /* Login.swift */,
+				9F4F31142A0425E0003C0170 /* User.swift */,
+				9F4F31162A042F42003C0170 /* Communities.swift */,
+				9F3C3A362A06D91D000F2117 /* EditNeighbour.swift */,
 			);
 			path = view;
 			sourceTree = "<group>";
@@ -170,11 +188,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9F4F31192A043EE9003C0170 /* Neighbour.swift in Sources */,
+				9F4F31132A041E69003C0170 /* Login.swift in Sources */,
+				9F4F31172A042F42003C0170 /* Communities.swift in Sources */,
+				9F385E262A05F02A00A35484 /* Meetings.swift in Sources */,
 				9F85AEF729FA4B9C00C2BD28 /* CommunityDataResponseModel.swift in Sources */,
 				9F81E37F29F9347700F8CAB0 /* LoginView.swift in Sources */,
 				9F81E37329F92DDA00F8CAB0 /* ContentView.swift in Sources */,
 				9F85AEFA29FA4CD000C2BD28 /* CommunitiesViewModel.swift in Sources */,
+				9F3C3A372A06D91D000F2117 /* EditNeighbour.swift in Sources */,
 				9F81E37129F92DD900F8CAB0 /* DerramaSPLApp.swift in Sources */,
+				9F4F31152A0425E0003C0170 /* User.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
