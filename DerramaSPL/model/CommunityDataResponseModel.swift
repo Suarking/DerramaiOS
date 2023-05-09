@@ -38,3 +38,12 @@ struct FoundDataNeighbourModel: Codable{
   
 }
 
+struct FoundDataNotices: Codable{
+  var _id: String
+  var _rev: String
+  var tabla: String
+  var comunidad: String
+  var texto: String
+  var fecha: String
+}
+

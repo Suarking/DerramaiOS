@@ -51,14 +51,65 @@ struct MeetingsView: View {
             NavigationLink {
               ScrollView{
                 Text("CONTENIDO REUNIONES")
+                  
+                  Button("Print avisos"){
+                      Task{
+                          await viewModel.getNotifications()
+                      }
+                  }
               }
             } label: {
               Label("Reuniones", systemImage: "list.bullet.clipboard.fill")
                 .font(.system(size: 18, weight: .semibold, design: .rounded))
             }
             NavigationLink {
+                
+                VStack{
+                    NavigationLink{
+                        Text("Añadir aviso aquí")
+                        
+                    }label: {
+                        Label("Añadir aviso", systemImage: "ellipsis.message.fill")
+                            .font(.system(size: 18, weight: .semibold, design: .rounded))
+                            
+                    }
+                }
+                
+                
+                
+                VStack{
+                    Text("Lista de avisos")
+                }
               ScrollView{
-                Text("CONTENIDO MENSAJES")
+                  
+                  
+                      ForEach(viewModel.notices, id: \._id) { notice in
+                                      VStack(alignment: .leading) {
+                                          
+                                          VStack{
+                                              if notice.texto != "" && notice.fecha != "" {
+                                              Divider()
+                                                  Text("Aviso: \(notice.texto)")
+                                                      .font(.headline)
+                                                  Text("Fecha: \(notice.fecha)")
+                                                      .font(.subheadline)
+                                                      .foregroundColor(.gray)
+                                                  Divider()
+                                              }else{
+                                                  
+                                              }
+                                              
+                                          }
+                                         
+                                      }
+                                  }
+                             
+              }
+              .onAppear{
+                  Task{
+                      await viewModel.getNotifications()
+                  }
+                  
               }
             } label: {
               Label("Mensajes", systemImage: "ellipsis.message.fill")

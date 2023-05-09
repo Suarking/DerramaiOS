@@ -11,8 +11,6 @@ import Combine
 struct EditNeighbourView: View {
   @StateObject var viewModel = CommunitiesViewModel()
 
-  @State private var editPisoVecino = ""
-  @State private var editTelefonoVecino = ""
   
   var body: some View {
     
@@ -37,61 +35,112 @@ struct EditNeighbourView: View {
         .background(.ultraThinMaterial)
       }
       VStack {
-        Text("Editando \(viewModel.editVecino.nombre)")
+        Text("Editando Vecino")
           .font(.system(size: 28, weight: .semibold, design: .rounded))
           .padding(.top, 50)
       }
       Spacer()
-      ScrollView{
-        Text("Contenido Edición Vecinos")
-        TextField("Nombre de Vecino", text: $viewModel.editVecino.nombre)
-          .shadow(color: Color.white, radius: 4, x: 0, y: 1)
-          .shadow(color: Color.black, radius: 1, x: 1, y: 1)
-          .padding()
-          .textFieldStyle(RoundedBorderTextFieldStyle())
-          .padding(.horizontal)
-          .autocapitalization(.none)
-        TextField("Piso", text: $editPisoVecino)
-          .shadow(color: Color.white, radius: 4, x: 0, y: 1)
-          .shadow(color: Color.black, radius: 1, x: 1, y: 1)
-          .padding()
-          .textFieldStyle(RoundedBorderTextFieldStyle())
-          .padding(.horizontal)
-          .autocapitalization(.none)
-        // .keyboardType(.numberPad)
-          .onReceive(Just(editPisoVecino)) { newValue in
-            let filtered = newValue.filter { "0123456789".contains($0) }
-            if filtered != newValue {
-              editPisoVecino = filtered
+        ScrollView{
+            
+            VStack{
+                
+                TextField("Nombre de Vecino", text: $viewModel.editNombreVecino)
+                    .shadow(color: Color.white, radius: 4, x: 0, y: 1)
+                    .shadow(color: Color.black, radius: 1, x: 1, y: 1)
+                    .padding()
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal)
+                    .autocapitalization(.none)
+                TextField("Piso", text: $viewModel.editPisoVecino)
+                    .shadow(color: Color.white, radius: 4, x: 0, y: 1)
+                    .shadow(color: Color.black, radius: 1, x: 1, y: 1)
+                    .padding()
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal)
+                    .autocapitalization(.none)
+                // .keyboardType(.numberPad)
+                    .onReceive(Just(viewModel.editPisoVecino)) { newValue in
+                        let filtered = newValue.filter { "0123456789".contains($0) }
+                        if filtered != newValue {
+                            viewModel.editPisoVecino = filtered
+                        }
+                    }
+                TextField("Letra de piso", text: $viewModel.editLetraVecino)
+                    .shadow(color: Color.white, radius: 4, x: 0, y: 1)
+                    .shadow(color: Color.black, radius: 1, x: 1, y: 1)
+                    .padding()
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal)
+                    .autocapitalization(.none)
+                TextField("Teléfono", text: $viewModel.editTelefonoVecino)
+                    .shadow(color: Color.white, radius: 4, x: 0, y: 1)
+                    .shadow(color: Color.black, radius: 1, x: 1, y: 1)
+                    .padding()
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal)
+                    .autocapitalization(.none)
+                // .keyboardType(.numberPad)
+                    .onReceive(Just(viewModel.editTelefonoVecino)) { newValue in
+                        let filtered = newValue.filter { "0123456789".contains($0) }
+                        if filtered != newValue {
+                            viewModel.editTelefonoVecino = filtered
+                        }
+                    }
+                
             }
-          }
-        TextField("Letra de piso", text: $viewModel.editVecino.letra)
-          .shadow(color: Color.white, radius: 4, x: 0, y: 1)
-          .shadow(color: Color.black, radius: 1, x: 1, y: 1)
-          .padding()
-          .textFieldStyle(RoundedBorderTextFieldStyle())
-          .padding(.horizontal)
-          .autocapitalization(.none)
-        TextField("Teléfono", text: $editTelefonoVecino)
-          .shadow(color: Color.white, radius: 4, x: 0, y: 1)
-          .shadow(color: Color.black, radius: 1, x: 1, y: 1)
-          .padding()
-          .textFieldStyle(RoundedBorderTextFieldStyle())
-          .padding(.horizontal)
-          .autocapitalization(.none)
-        // .keyboardType(.numberPad)
-          .onReceive(Just(editTelefonoVecino)) { newValue in
-            let filtered = newValue.filter { "0123456789".contains($0) }
-            if filtered != newValue {
-              editTelefonoVecino = filtered
+            HStack{
+                Button("Actualizar"){
+                    Task{
+                        if viewModel.editPisoVecino != "" && viewModel.editNombreVecino != "" && viewModel.editLetraVecino != "" && viewModel.editTelefonoVecino != ""{
+                            viewModel.editVecino = AddNeighbourModel(
+                              _rev: viewModel.editRevVecino,
+                              tabla: viewModel.editTablaVecino,
+                              piso: Int(viewModel.editPisoVecino)!,
+                              letra: viewModel.editLetraVecino,
+                              nombre: viewModel.editNombreVecino,
+                              telefono: Int(viewModel.editTelefonoVecino)!,
+                              comunidad: viewModel.editComunidadVecino
+                            )
+                            print(viewModel.editVecino)
+                            do {
+                                try await viewModel.updateNeighbour()
+                            } catch {
+                                print("Error actualizando el vecino: \(error.localizedDescription)")
+                            }
+                            
+                        }else{
+                            print("Rellena todos los campos")
+                        }
+                    }
+                    
+                    
+                    
+                    
+                    
+                }
+                .buttonStyle(.borderedProminent)
+                .font(.system(size: 20, weight: .semibold))
+                .padding()
+                .tint(.orange)
+                Button("Eliminar Vecino"){
+                    
+                }
+                .buttonStyle(.borderedProminent)
+                .font(.system(size: 20, weight: .semibold))
+                .padding()
+                .tint(.red)
+                
             }
-          }
-      }
+            
+            
+        }
       
       .onAppear{
         print(viewModel.editVecino)
-        editPisoVecino = String(viewModel.editVecino.piso)
-        editTelefonoVecino = String(viewModel.editVecino.telefono)
+          viewModel.editNombreVecino = viewModel.editNombreVecino
+          viewModel.editPisoVecino = viewModel.editPisoVecino
+          viewModel.editLetraVecino = viewModel.editLetraVecino
+          viewModel.editTelefonoVecino = viewModel.editTelefonoVecino
       }
       
       

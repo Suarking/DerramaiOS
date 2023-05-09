@@ -178,15 +178,15 @@ struct NeighbourView: View {
                     
                      
                     Button(action: {
-                      viewModel.editVecino = AddNeighbourModel(
-                        _rev: neighbour._rev,
-                        tabla: neighbour.tabla,
-                        piso: neighbour.piso,
-                        letra: neighbour.letra,
-                        nombre: neighbour.nombre,
-                        telefono: neighbour.telefono,
-                        comunidad: neighbour.comunidad
-                      )
+                        viewModel.editIdVecino = neighbour._id
+                        viewModel.editRevVecino = neighbour._rev
+                        viewModel.editTablaVecino = neighbour.tabla
+                        viewModel.editPisoVecino = String(neighbour.piso)
+                        viewModel.editLetraVecino = neighbour.letra
+                        viewModel.editNombreVecino = neighbour.nombre
+                        viewModel.editTelefonoVecino = String(neighbour.telefono)
+                        viewModel.editComunidadVecino = neighbour.comunidad
+                    
                       // Ir a Vista EditNeighbour
                       
                       viewModel.editViewActive = true

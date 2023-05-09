@@ -37,7 +37,8 @@ final class CommunitiesViewModel: ObservableObject {
   // Vecinos encontrados
   @Published var foundNeighbours: [FoundDataNeighbourModel] = []
   
-  
+    //Vista edición
+    @Published var editViewActive : Bool = false
   //Vecino a editar
   @Published var editVecino =  AddNeighbourModel(
     _rev: "",
@@ -49,8 +50,21 @@ final class CommunitiesViewModel: ObservableObject {
     comunidad: ""
   )
   
+  //Vecino a editar textfields
+    @Published var editIdVecino = ""
+    @Published var editRevVecino = ""
+    @Published var editTablaVecino = "VECINO"
+    @Published var editPisoVecino = ""
+    @Published var editTelefonoVecino = ""
+    @Published var editNombreVecino = ""
+    @Published var editLetraVecino = ""
+    @Published var editComunidadVecino = ""
+    
+    
+    //Noticias
+    @Published var notices : [FoundDataNotices] = []
   
-  @Published var editViewActive : Bool = false
+
   
   //============================================
 
@@ -191,4 +205,56 @@ final class CommunitiesViewModel: ObservableObject {
       print(error.localizedDescription)
     }
   }
+    func updateNeighbour() async throws{
+        let url = URL(string: "https://appstic.eu/vecino/\(self.editIdVecino)")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "PUT"
+        request.setValue("application/json", forHTTPHeaderField: "accept")
+        request.setValue("Bearer \(self.token)", forHTTPHeaderField: "authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        let body: [String: Any] = [
+            "_rev": self.editVecino._rev,
+            "tabla": "VECINO",
+            "piso": self.editVecino.piso,
+            "letra": self.editVecino.letra,
+            "nombre": self.editVecino.nombre,
+            "telefono": self.editVecino.telefono,
+            "comunidad": self.editVecino.comunidad
+        ]
+        let jsonData = try JSONSerialization.data(withJSONObject: body)
+        request.httpBody = jsonData
+
+        do {
+            let (data, _) = try await URLSession.shared.data(for: request)
+            let responseString = String(decoding: data, as: UTF8.self)
+            print(responseString)
+        } catch {
+            print("Error updating neighbour: \(error.localizedDescription)")
+        }
+    }
+    
+    
+    //AVISOS
+    func getNotifications() async {
+        let url = URL(string: "https://appstic.eu/aviso/\(self.selectedCommunityId)")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("application/json", forHTTPHeaderField: "accept")
+        request.setValue("Bearer \(self.token)", forHTTPHeaderField: "authorization")
+
+        do {
+            let (data, _) = try await URLSession.shared.data(for: request)
+            let notices = try JSONDecoder().decode([FoundDataNotices].self, from: data)
+            DispatchQueue.main.async {
+                self.notices = notices
+                print(self.notices)
+            }
+        } catch {
+            DispatchQueue.main.async {
+                print("Error getting notifications: \(error.localizedDescription)")
+            }
+        }
+    }
+
+
 }
