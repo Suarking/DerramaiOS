@@ -8,7 +8,10 @@
 import Foundation
 
 final class CommunitiesViewModel: ObservableObject {
-  // Variables Login
+  // MARK: - ===============VARIABLES GLOBALES=====================
+
+  // MARK: - Variables Login
+
   @Published var token: String = ""
   @Published var username: String = ""
   @Published var password: String = ""
@@ -17,15 +20,18 @@ final class CommunitiesViewModel: ObservableObject {
   @Published var isLogged: Bool = false
   @Published var error: String = ""
 
-  // Variables Comunidad
+  // MARK: - Variables Comunidad
+
   @Published var communities: [CommunityDataModel] = []
   @Published var selectedCommunityName: String = ""
   @Published var selectedCommunityIndex: Int = 0
   @Published var selectedCommunityId: String = ""
 
-  // Vecino anyadido
-  @Published var addVecino = AddNeighbourModel(
-    _rev: "",
+  // MARK: - ------ VECINO -------
+
+  // MARK: - Vecino anyadido
+
+  @Published var addVecino = AddAddNeighbourModel(
     tabla: "VECINO",
     piso: 0,
     letra: "",
@@ -34,13 +40,23 @@ final class CommunitiesViewModel: ObservableObject {
     comunidad: ""
   )
 
-  // Vecinos encontrados
+  // MARK: - Vecinos encontrados
+
   @Published var foundNeighbours: [FoundDataNeighbourModel] = []
-  
-    //Vista edición
-    @Published var editViewActive : Bool = false
-  //Vecino a editar
-  @Published var editVecino =  AddNeighbourModel(
+
+  // MARK: - Textfields Editar Vecino
+
+  @Published var editIdVecino = ""
+  @Published var editRevVecino = ""
+  @Published var editTablaVecino = "VECINO"
+  @Published var editPisoVecino = ""
+  @Published var editTelefonoVecino = ""
+  @Published var editNombreVecino = ""
+  @Published var editLetraVecino = ""
+  @Published var editComunidadVecino = ""
+
+  // MARK: - Vecino a editar
+  @Published var editVecino = AddNeighbourModel(
     _rev: "",
     tabla: "VECINO",
     piso: 0,
@@ -49,27 +65,25 @@ final class CommunitiesViewModel: ObservableObject {
     telefono: 0,
     comunidad: ""
   )
-  
-  //Vecino a editar textfields
-    @Published var editIdVecino = ""
-    @Published var editRevVecino = ""
-    @Published var editTablaVecino = "VECINO"
-    @Published var editPisoVecino = ""
-    @Published var editTelefonoVecino = ""
-    @Published var editNombreVecino = ""
-    @Published var editLetraVecino = ""
-    @Published var editComunidadVecino = ""
-    
-    
-    //Noticias
-    @Published var notices : [FoundDataNotices] = []
-  
 
-  
+  //MARK: - Toggle Vista edición Vecino
+  @Published var editViewActive: Bool = false
+
+  // Noticias
+  @Published var notices: [FoundDataNotices] = []
+
+  // Alertas
+  @Published var showAlert: Bool = false
+  @Published var showSuccessAlert: Bool = false
+  @Published var showErrorAlert: Bool = false
+
+  // Reuniones
+  @Published var foundMeetings: [MeetingDataModel] = []
+    
+    
+
   //============================================
-
   // MARK: - --------FUNCIONES API-----------
-
   //============================================
 
   // LOGIN
@@ -109,13 +123,13 @@ final class CommunitiesViewModel: ObservableObject {
       print(error.localizedDescription)
     }
   }
-  
-  //ROL DE USUARIO
+
+  // ROL DE USUARIO
   func checkUserRole() {
-    if (self.currentUser=="bec1" || self.currentUser=="bec2" || self.currentUser=="bec3"){
-      self.userRole = "ADMIN"
-    }else{
-      self.userRole = "Vecino"
+    if currentUser == "bec1" || currentUser == "bec2" || currentUser == "bec3" {
+      userRole = "ADMIN"
+    } else {
+      userRole = "Vecino"
     }
   }
 
@@ -180,7 +194,29 @@ final class CommunitiesViewModel: ObservableObject {
 
   // AÑADIR VECINO
 
-  func addNeighbour(addVecino: AddNeighbourModel) {
+  func addNeighbour(addVecino: AddAddNeighbourModel) async throws {
+    let url = URL(string: "https://appstic.eu/vecino")!
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    request.setValue("application/json", forHTTPHeaderField: "accept")
+    request.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+
+    let body = try JSONEncoder().encode(addVecino)
+    request.httpBody = body
+
+    let (data, response) = try await URLSession.shared.data(for: request)
+
+    if let httpResponse = response as? HTTPURLResponse,
+       httpResponse.statusCode != 201 {
+      print("Error al añadir vecino. Status code: \(httpResponse.statusCode)")
+      return
+    }
+
+    let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+    if let message = json?["message"] as? String {
+      print(message)
+    }
   }
 
   // OBTENER VECINOS
@@ -205,56 +241,100 @@ final class CommunitiesViewModel: ObservableObject {
       print(error.localizedDescription)
     }
   }
-    func updateNeighbour() async throws{
-        let url = URL(string: "https://appstic.eu/vecino/\(self.editIdVecino)")!
-        var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
-        request.setValue("application/json", forHTTPHeaderField: "accept")
-        request.setValue("Bearer \(self.token)", forHTTPHeaderField: "authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        let body: [String: Any] = [
-            "_rev": self.editVecino._rev,
-            "tabla": "VECINO",
-            "piso": self.editVecino.piso,
-            "letra": self.editVecino.letra,
-            "nombre": self.editVecino.nombre,
-            "telefono": self.editVecino.telefono,
-            "comunidad": self.editVecino.comunidad
-        ]
-        let jsonData = try JSONSerialization.data(withJSONObject: body)
-        request.httpBody = jsonData
+    // EDITAR VECINOS
+  func updateNeighbour() async throws {
+    let url = URL(string: "https://appstic.eu/vecino/\(editIdVecino)")!
+    var request = URLRequest(url: url)
+    request.httpMethod = "PUT"
+    request.setValue("application/json", forHTTPHeaderField: "accept")
+    request.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    let body: [String: Any] = [
+      "_rev": editVecino._rev,
+      "tabla": "VECINO",
+      "piso": editVecino.piso,
+      "letra": editVecino.letra,
+      "nombre": editVecino.nombre,
+      "telefono": editVecino.telefono,
+      "comunidad": editVecino.comunidad,
+    ]
+    let jsonData = try JSONSerialization.data(withJSONObject: body)
+    request.httpBody = jsonData
 
-        do {
-            let (data, _) = try await URLSession.shared.data(for: request)
-            let responseString = String(decoding: data, as: UTF8.self)
-            print(responseString)
-        } catch {
-            print("Error updating neighbour: \(error.localizedDescription)")
-        }
+    do {
+      let (data, _) = try await URLSession.shared.data(for: request)
+      let responseString = String(decoding: data, as: UTF8.self)
+      print(responseString)
+    } catch {
+      print("Error updating neighbour: \(error.localizedDescription)")
     }
-    
-    
-    //AVISOS
-    func getNotifications() async {
-        let url = URL(string: "https://appstic.eu/aviso/\(self.selectedCommunityId)")!
+  }
+    // ELIMINAR VECINO
+    func deleteNeighbor() async {
+        let url = URL(string: "https://appstic.eu/vecino/\(self.editIdVecino)?rev=\(self.editRevVecino)")!
         var request = URLRequest(url: url)
-        request.httpMethod = "GET"
+        request.httpMethod = "DELETE"
         request.setValue("application/json", forHTTPHeaderField: "accept")
-        request.setValue("Bearer \(self.token)", forHTTPHeaderField: "authorization")
-
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+        
         do {
-            let (data, _) = try await URLSession.shared.data(for: request)
-            let notices = try JSONDecoder().decode([FoundDataNotices].self, from: data)
-            DispatchQueue.main.async {
-                self.notices = notices
-                print(self.notices)
-            }
+          let (data, _) = try await URLSession.shared.data(for: request)
+          let responseString = String(decoding: data, as: UTF8.self)
+          print(responseString)
         } catch {
-            DispatchQueue.main.async {
-                print("Error getting notifications: \(error.localizedDescription)")
-            }
+          print("Error deleting neighbour: \(error.localizedDescription)")
         }
+      }
+    
+    //================API AVISOS==================
+  // AVISOS
+  func getNotifications() async {
+    let url = URL(string: "https://appstic.eu/aviso/\(selectedCommunityId)")!
+    var request = URLRequest(url: url)
+    request.httpMethod = "GET"
+    request.setValue("application/json", forHTTPHeaderField: "accept")
+    request.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+
+    do {
+      let (data, _) = try await URLSession.shared.data(for: request)
+      let notices = try JSONDecoder().decode([FoundDataNotices].self, from: data)
+      DispatchQueue.main.async {
+        self.notices = notices
+        print(self.notices)
+      }
+    } catch {
+      DispatchQueue.main.async {
+        print("Error getting notifications: \(error.localizedDescription)")
+      }
     }
+  }
 
+  // Reuniones
+  func getMeetings() async {
+    let url = URL(string: "https://appstic.eu/reunion/\(selectedCommunityId)")!
 
+    var request = URLRequest(url: url)
+    request.httpMethod = "GET"
+    request.addValue("application/json", forHTTPHeaderField: "accept")
+    request.addValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+
+    URLSession.shared.dataTask(with: request) { data, response, error in
+      do {
+        guard let data = data else {
+          throw NSError(domain: "com.example.app", code: 400, userInfo: [NSLocalizedDescriptionKey: "No se han podido obtener las reuniones"])
+        }
+        guard let response = response as? HTTPURLResponse, (200 ... 299).contains(response.statusCode) else {
+          print("Error obteniendo reuniones")
+          return
+        }
+        let meetings = try JSONDecoder().decode([MeetingDataModel].self, from: data)
+        DispatchQueue.main.async {
+          self.foundMeetings = meetings
+        }
+
+      } catch let error {
+        print("Error en getMeetings: \(error)")
+      }
+    }.resume()
+  }
 }

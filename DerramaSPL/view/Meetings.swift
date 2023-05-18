@@ -9,8 +9,7 @@ import SwiftUI
 
 struct MeetingsView: View {
   @StateObject var viewModel = CommunitiesViewModel()
-  
-  
+
   var body: some View {
     VStack {
       VStack {
@@ -31,102 +30,116 @@ struct MeetingsView: View {
         .foregroundColor(Color.black)
         .background(.ultraThinMaterial)
       }
-      
-      Spacer()
 
       VStack {
-        Text("Reuniones/Mensajes")
+        Text("Reuniones/Avisos")
           .font(.system(size: 36, weight: .semibold, design: .rounded))
-          .padding()
+          .padding(.bottom)
           .padding(.top, 30)
         Text("\(viewModel.selectedCommunityName)")
           .font(.system(size: 24, weight: .semibold, design: .rounded))
           .padding()
+      }
 
-        }
-        Spacer()
-        
-        NavigationStack{
-          List{
-            NavigationLink {
-              ScrollView{
-                Text("CONTENIDO REUNIONES")
-                  
-                  Button("Print avisos"){
-                      Task{
-                          await viewModel.getNotifications()
-                      }
-                  }
-              }
-            } label: {
-              Label("Reuniones", systemImage: "list.bullet.clipboard.fill")
-                .font(.system(size: 18, weight: .semibold, design: .rounded))
-            }
-            NavigationLink {
-                
-                VStack{
-                    NavigationLink{
-                        Text("Añadir aviso aquí")
-                        
-                    }label: {
-                        Label("Añadir aviso", systemImage: "ellipsis.message.fill")
-                            .font(.system(size: 18, weight: .semibold, design: .rounded))
-                            
+      NavigationStack {
+        List {
+          // Navlink reuniones
+          NavigationLink {
+            ScrollView {
+              Text("CONTENIDO REUNIONES")
+                Button("Print reuniones") {
+                    Task{
+                        await viewModel.getMeetings()
                     }
-                }
-                
-                
-                
-                VStack{
-                    Text("Lista de avisos")
-                }
-              ScrollView{
-                  
-                  
-                      ForEach(viewModel.notices, id: \._id) { notice in
-                                      VStack(alignment: .leading) {
-                                          
-                                          VStack{
-                                              if notice.texto != "" && notice.fecha != "" {
-                                              Divider()
-                                                  Text("Aviso: \(notice.texto)")
-                                                      .font(.headline)
-                                                  Text("Fecha: \(notice.fecha)")
-                                                      .font(.subheadline)
-                                                      .foregroundColor(.gray)
-                                                  Divider()
-                                              }else{
-                                                  
-                                              }
-                                              
-                                          }
-                                         
-                                      }
-                                  }
-                             
-              }
-              .onAppear{
-                  Task{
-                      await viewModel.getNotifications()
                   }
-                  
-              }
-            } label: {
-              Label("Mensajes", systemImage: "ellipsis.message.fill")
-                .font(.system(size: 18, weight: .semibold, design: .rounded))
             }
+          } label: {
+            Label("Reuniones", systemImage: "list.bullet.clipboard.fill")
+              .font(.system(size: 18, weight: .semibold, design: .rounded))
           }
-          .scrollContentBackground(.hidden)
+          .navigationTitle("")
+
+          // Navlink avisos
+          NavigationLink {
+            VStack {
+              // Navlink anyadir aviso
+              NavigationLink {
+                Text("Añadir aviso aquí")
+
+              } label: {
+                Label("Añadir aviso", systemImage: "ellipsis.message.fill")
+                  .font(.system(size: 18, weight: .semibold, design: .rounded))
+              }
+              .navigationTitle("")
+              .buttonStyle(.borderedProminent)
+            }
+
+            VStack {
+              Divider()
+                Label("Lista de avisos", systemImage: "ellipsis.message.fill")
+                  .symbolRenderingMode(.multicolor)
+                  .font(.system(size: 18))
+                  .padding(.top, 10)
+            }
+            ScrollView {
+              ForEach(viewModel.notices, id: \._id) { notice in
+                VStack(alignment: .leading) {
+                  VStack {
+                    if notice.texto != "" && notice.fecha != "" {
+                      Divider()
+                      HStack {
+                        Text("Aviso: ")
+                          .font(.headline)
+
+                        Text("\(notice.texto)")
+
+                          Button("Borrar") {
+                              viewModel.showAlert = true
+                              }
+                              .alert(isPresented: $viewModel.showAlert) {
+                                  Alert(
+                                      title: Text("Función no disponible"),
+                                      message: Text("Endpoint no implementado " +
+                                                      "en el backend.")
+                                  )
+                              }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.red)
+                      }.padding()
+
+                      Text("Fecha: \(notice.fecha)")
+                        .font(.subheadline)
+                        .foregroundColor(.gray)
+
+                      Divider()
+                    } else {
+                    }
+                  }
+                }
+              }
+            }
+            .onAppear {
+              Task {
+                await viewModel.getNotifications()
+              }
+            }
+          } label: {
+            Label("Avisos", systemImage: "ellipsis.message.fill")
+              .font(.system(size: 18, weight: .semibold, design: .rounded))
+          }
+          .navigationTitle("")
         }
-      
+        .scrollContentBackground(.hidden)
+        Spacer()
+      }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background(LinearGradient(colors: [.white, .white, .white,.white,  .orange], startPoint: .bottomLeading, endPoint: .top))
+    .background(LinearGradient(colors: [.white, .white, .white, .white, .orange], startPoint: .bottomLeading, endPoint: .top))
   }
 }
 
 struct MeetingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        MeetingsView()
-    }
+  static var previews: some View {
+    MeetingsView()
+  }
 }

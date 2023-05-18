@@ -14,35 +14,32 @@ struct ContentView: View {
   //==============================LOGIN============================
   var body: some View {
     if !viewModel.isLogged {
+      // Vista Login
+      Login(viewModel: viewModel)
 
-      //Vista Login
-    Login(viewModel: viewModel)
-       
       //============================TABVIEW GENERAL=================================
 
     } else {
       TabView {
         Group {
-          //Usuario
+          // Usuario
           UserView(currentUser: $viewModel.currentUser, viewModel: viewModel)
-          .tabItem {
-            Label("Usuario", systemImage: "person.circle.fill")
-          }
-          .background(LinearGradient(colors: [.white, .white, .white, .blue], startPoint: .bottomLeading, endPoint: .top))
+            .tabItem {
+              Label("Usuario", systemImage: "person.circle.fill")
+            }
+            .background(LinearGradient(colors: [.white, .white, .white, .blue], startPoint: .bottomLeading, endPoint: .top))
           //==============================COMUNIDADES=================================
 
-          if(viewModel.userRole == "ADMIN"){
+          if viewModel.userRole == "ADMIN" {
             CommunityView(viewModel: viewModel)
               .frame(maxWidth: .infinity, maxHeight: .infinity)
               .tabItem {
                 Label("Comunidades", systemImage: "building.2.fill")
               }
               .background(LinearGradient(colors: [.white, .white, .white, .red], startPoint: .bottomLeading, endPoint: .top))
-          
-          
-          //==================VECINOS======================================
-         
-            
+
+            //==================VECINOS======================================
+
             NeighbourView(viewModel: viewModel)
               .tabItem {
                 Label("Vecinos", systemImage: "person.3.fill")
@@ -51,20 +48,28 @@ struct ContentView: View {
                 print("Id de comunidad seleccionada: \(viewModel.selectedCommunityId)")
               }
               .background(LinearGradient(colors: [.white, .white, .white, .purple], startPoint: .bottomLeading, endPoint: .top))
-          }
-          
-          //==================REUNIONES======================================
          
-        
+
+          //==================REUNIONES======================================
             MeetingsView(viewModel: viewModel)
+          
             .tabItem {
               Label("Reuniones", systemImage: "list.bullet.clipboard.fill")
             }
             .background(LinearGradient(colors: [.white, .white, .white, .yellow], startPoint: .bottomLeading, endPoint: .top))
-
-           
-
-
+            
+          }
+            
+            if viewModel.userRole == "Vecino"{
+                neibMeetingsView(viewModel: viewModel)
+              
+                .tabItem {
+                  Label("Reuniones", systemImage: "list.bullet.clipboard.fill")
+                }
+                .background(LinearGradient(colors: [.white, .white, .white, .yellow], startPoint: .bottomLeading, endPoint: .top))
+            }
+            
+            
         }
         .toolbarColorScheme(.light, for: .tabBar)
       }
