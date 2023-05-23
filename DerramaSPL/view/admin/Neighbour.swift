@@ -40,22 +40,25 @@ struct NeighbourView: View {
           .font(.system(size: 28, weight: .semibold, design: .rounded))
           .foregroundColor(Color.black)
           .background(.ultraThinMaterial)
-        }
+            
+            if viewModel.selectedCommunityName == "" {
+              VStack {
+                Text("Selecciona antes una comunidad para comenzar")
+                  .font(.system(size: 28, weight: .semibold, design: .rounded))
+                  .padding(.top, 50)
+              }
+              .multilineTextAlignment(.center)
+            } else {
+              VStack {
+                Text("Administrando vecinos de \(viewModel.selectedCommunityName)")
+                  .font(.system(size: 28, weight: .semibold, design: .rounded))
+                  .multilineTextAlignment(.center)
+                  .padding(.vertical, 30)
+              }
+       
         Spacer()
         ScrollView {
-          if viewModel.selectedCommunityName == "" {
-            VStack {
-              Text("Selecciona antes una comunidad para comenzar")
-                .font(.system(size: 28, weight: .semibold, design: .rounded))
-                .padding(.top, 50)
-            }
-            .multilineTextAlignment(.center)
-          } else {
-            VStack {
-              Text("Administrando vecinos de \(viewModel.selectedCommunityName)")
-                .font(.system(size: 28, weight: .semibold, design: .rounded))
-                .padding()
-            }
+          
 
             VStack(spacing: 0) {
               Divider()
@@ -158,6 +161,7 @@ struct NeighbourView: View {
               .font(.system(size: 20, weight: .semibold))
               .padding()
             }
+            .navigationTitle("")
             VStack {
               if viewModel.foundNeighbours.count == 0 {
                 Text("No hay vecinos encontrados")
@@ -198,6 +202,7 @@ struct NeighbourView: View {
                       Text("Editar datos")
                     }
                     .navigationDestination(isPresented: $viewModel.editViewActive, destination: { EditNeighbourView(viewModel: viewModel) })
+                    
                     .buttonStyle(.borderedProminent)
                     .font(.system(size: 19, weight: .semibold))
                     .multilineTextAlignment(.center)
@@ -208,6 +213,10 @@ struct NeighbourView: View {
               }
             }
           }
+            
+            }
+            Spacer()
+            
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -216,6 +225,7 @@ struct NeighbourView: View {
         self.setToDefaults()
       }
     }
+      
   }
 
   func addVecino() {

@@ -68,6 +68,12 @@ struct CommunityView: View {
               .shadow(radius: 10)
               .frame(width: 250, height: 250)
               .padding(10)
+              
+              VStack{
+                  Text("Ninguna comunidad seleccionada")
+                      .padding(.vertical)
+                      .foregroundColor(.blue)
+              }
           }
         }
         Spacer()

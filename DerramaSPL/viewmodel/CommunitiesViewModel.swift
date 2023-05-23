@@ -44,6 +44,14 @@ final class CommunitiesViewModel: ObservableObject {
 
   @Published var foundNeighbours: [FoundDataNeighbourModel] = []
 
+  // MARK: - Todos los vecinos
+
+  @Published var allNeighbours: [FoundDataNeighbourModel] = []
+
+  // MARK: - Vecinos convocados a la reunión
+
+  @Published var meetNeighbours: [Vecino] = []
+
   // MARK: - Textfields Editar Vecino
 
   @Published var editIdVecino = ""
@@ -56,6 +64,7 @@ final class CommunitiesViewModel: ObservableObject {
   @Published var editComunidadVecino = ""
 
   // MARK: - Vecino a editar
+
   @Published var editVecino = AddNeighbourModel(
     _rev: "",
     tabla: "VECINO",
@@ -66,7 +75,8 @@ final class CommunitiesViewModel: ObservableObject {
     comunidad: ""
   )
 
-  //MARK: - Toggle Vista edición Vecino
+  // MARK: - Toggle Vista edición Vecino
+
   @Published var editViewActive: Bool = false
 
   // Noticias
@@ -79,11 +89,11 @@ final class CommunitiesViewModel: ObservableObject {
 
   // Reuniones
   @Published var foundMeetings: [MeetingDataModel] = []
-    
-    
 
   //============================================
+
   // MARK: - --------FUNCIONES API-----------
+
   //============================================
 
   // LOGIN
@@ -219,7 +229,7 @@ final class CommunitiesViewModel: ObservableObject {
     }
   }
 
-  // OBTENER VECINOS
+  // BUSCAR VECINOS
 
   func searchNeighbours(communityId: String, name: String) async {
     let url = URL(string: "https://appstic.eu/vecino/\(communityId)/\(name)")!
@@ -241,7 +251,8 @@ final class CommunitiesViewModel: ObservableObject {
       print(error.localizedDescription)
     }
   }
-    // EDITAR VECINOS
+
+  // EDITAR VECINOS
   func updateNeighbour() async throws {
     let url = URL(string: "https://appstic.eu/vecino/\(editIdVecino)")!
     var request = URLRequest(url: url)
@@ -269,25 +280,64 @@ final class CommunitiesViewModel: ObservableObject {
       print("Error updating neighbour: \(error.localizedDescription)")
     }
   }
-    // ELIMINAR VECINO
-    func deleteNeighbor() async {
-        let url = URL(string: "https://appstic.eu/vecino/\(self.editIdVecino)?rev=\(self.editRevVecino)")!
-        var request = URLRequest(url: url)
-        request.httpMethod = "DELETE"
-        request.setValue("application/json", forHTTPHeaderField: "accept")
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
-        
-        do {
-          let (data, _) = try await URLSession.shared.data(for: request)
-          let responseString = String(decoding: data, as: UTF8.self)
-          print(responseString)
-        } catch {
-          print("Error deleting neighbour: \(error.localizedDescription)")
+
+  // ELIMINAR VECINO
+  func deleteNeighbor() async {
+    let url = URL(string: "https://appstic.eu/vecino/\(editIdVecino)?rev=\(editRevVecino)")!
+    var request = URLRequest(url: url)
+    request.httpMethod = "DELETE"
+    request.setValue("application/json", forHTTPHeaderField: "accept")
+    request.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+
+    do {
+      let (data, _) = try await URLSession.shared.data(for: request)
+      let responseString = String(decoding: data, as: UTF8.self)
+      print(responseString)
+    } catch {
+      print("Error deleting neighbour: \(error.localizedDescription)")
+    }
+  }
+
+  // OBTENER TODOS LOS VECINOS
+  func getAllNeighbors() async {
+    let url = URL(string: "https://appstic.eu/comunidad/vecinos/\(selectedCommunityId)")!
+
+    var request = URLRequest(url: url)
+    request.httpMethod = "GET"
+    request.addValue("application/json", forHTTPHeaderField: "accept")
+    request.addValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+
+    do {
+      let (data, response) = try await URLSession.shared.data(for: request)
+
+      guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+        print("No se ha podido obtener la información de los vecinos")
+        return
+      }
+
+      let neighbors = try JSONDecoder().decode([FoundDataNeighbourModel].self, from: data)
+
+      DispatchQueue.main.async {
+        self.allNeighbours = neighbors
+
+        // Aprovechamos y sacamos modelo para convocar reuniones
+        for neighbour in self.allNeighbours {
+          let vecino = Vecino(vecino: neighbour._id, asiste: false)
+          self.meetNeighbours.append(vecino)
+          dump(self.meetNeighbours)
         }
       }
-    
-    //================API AVISOS==================
-  // AVISOS
+
+    } catch {
+      DispatchQueue.main.async {
+        print("Error en getNeighbors: \(error)")
+      }
+    }
+  }
+
+  //================API AVISOS==================
+
+  // Obtener AVISOS
   func getNotifications() async {
     let url = URL(string: "https://appstic.eu/aviso/\(selectedCommunityId)")!
     var request = URLRequest(url: url)
@@ -300,7 +350,7 @@ final class CommunitiesViewModel: ObservableObject {
       let notices = try JSONDecoder().decode([FoundDataNotices].self, from: data)
       DispatchQueue.main.async {
         self.notices = notices
-        print(self.notices)
+        dump(self.notices)
       }
     } catch {
       DispatchQueue.main.async {
@@ -309,7 +359,83 @@ final class CommunitiesViewModel: ObservableObject {
     }
   }
 
+  func addAviso(comunidadID: String, texto: String, fecha: String) async {
+    let url = URL(string: "https://appstic.eu/aviso")!
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.setValue("application/json", forHTTPHeaderField: "accept")
+    request.setValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+    let body: [String: Any] = [
+      "tabla": "AVISO",
+      "comunidad": comunidadID,
+      "texto": texto,
+      "fecha": fecha,
+    ]
+
+    do {
+      let jsonData = try JSONSerialization.data(withJSONObject: body)
+      request.httpBody = jsonData
+
+      let (data, _) = try await URLSession.shared.data(for: request)
+      let response = try JSONDecoder().decode(AddAvisoResponse.self, from: data)
+
+      DispatchQueue.main.async {
+        print(response.message)
+      }
+    } catch {
+      DispatchQueue.main.async {
+        print("Error adding aviso: \(error.localizedDescription)")
+      }
+    }
+  }
+
   // Reuniones
+  func addMeeting(fecha: String, nombre: String, vecinos: [Vecino]) async {
+    let url = URL(string: "https://appstic.eu/reunion")!
+
+    var request = URLRequest(url: url)
+    request.httpMethod = "POST"
+    request.addValue("application/json", forHTTPHeaderField: "accept")
+    request.addValue("Bearer \(token)", forHTTPHeaderField: "authorization")
+
+    let newMeeting = MeetingDataModel(tabla: "REUNION",
+                                      fecha: fecha,
+                                      comunidad: "\(selectedCommunityId)",
+                                      nombre: nombre,
+                                      vecinos: vecinos)
+
+    guard let jsonData = try? JSONEncoder().encode(newMeeting) else {
+      print("Error encoding meeting data")
+      return
+    }
+
+    request.httpBody = jsonData
+    request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+
+    do {
+      let (data, response) = try await URLSession.shared.data(for: request)
+      guard let httpResponse = response as? HTTPURLResponse, (200 ... 299).contains(httpResponse.statusCode) else {
+        print("Error adding meeting")
+        return
+      }
+
+      let jsonDecoder = JSONDecoder()
+      let responseModel = try jsonDecoder.decode(AddMeetingResponse.self, from: data)
+      print(responseModel.message)
+
+      DispatchQueue.main.async {
+        // Handle successful response
+      }
+    } catch {
+      print("Error adding meeting: \(error)")
+      DispatchQueue.main.async {
+        // Handle error
+      }
+    }
+  }
+
   func getMeetings() async {
     let url = URL(string: "https://appstic.eu/reunion/\(selectedCommunityId)")!
 
@@ -330,6 +456,7 @@ final class CommunitiesViewModel: ObservableObject {
         let meetings = try JSONDecoder().decode([MeetingDataModel].self, from: data)
         DispatchQueue.main.async {
           self.foundMeetings = meetings
+          dump(self.foundMeetings)
         }
 
       } catch let error {

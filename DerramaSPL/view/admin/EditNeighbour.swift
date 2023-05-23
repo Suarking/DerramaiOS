@@ -144,6 +144,7 @@ struct EditNeighbourView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(LinearGradient(colors: [.white, .white, .white, .purple], startPoint: .bottomLeading, endPoint: .top))
     }
+    
 }
 }
 

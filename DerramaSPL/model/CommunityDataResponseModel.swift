@@ -62,7 +62,7 @@ struct FoundDataNotices: Codable{
 // MARK: - Modelo Reuniones
 struct MeetingDataModel: Codable {
     var tabla, fecha, comunidad, nombre: String
-    var vecinos: [Vecino]
+    var vecinos: [Vecino]?
 }
 
 // MARK: - Modelo Vecino
@@ -71,9 +71,19 @@ struct Vecino: Codable {
     var asiste: Bool?
 }
 
+
 struct DeleteNeighborResponse: Codable {
     let message: String
 }
+
+struct AddAvisoResponse: Codable {
+    let message: String
+}
+
+struct AddMeetingResponse: Codable {
+    let message: String
+}
+
 
 
 

@@ -66,6 +66,7 @@ struct ContentView: View {
                 .tabItem {
                   Label("Reuniones", systemImage: "list.bullet.clipboard.fill")
                 }
+                
                 .background(LinearGradient(colors: [.white, .white, .white, .yellow], startPoint: .bottomLeading, endPoint: .top))
             }
             
