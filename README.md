@@ -6,10 +6,6 @@ _Proyecto FCT para NTT Data_
 
 _DerramaiOS es una app de gestión de comunidades desarrollada íntegramente en Swift._
 
-
-_En ella se integran aspectos como arquitecura MVVM, RecyclerView, LiveData, backend con autenticación y operaciones CRUD en BD externa (Firebase)._
-_También se utilizan otros recursos como el ViewBinding, corrutinas..._
-
 ### Pre-requisitos 📋
 
 _Antes de poner en marcha el proyecto, necesitaremos:_
