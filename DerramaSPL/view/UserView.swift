@@ -47,9 +47,12 @@ struct UserView: View {
         }
 
         Spacer()
-        Text("Selecciona una Comunidad en la pestaña Comunidades para empezar a gestionarla")
-          .foregroundColor(.blue)
-          .padding()
+          if viewModel.userRole == "ADMIN"{
+              Text("Selecciona una Comunidad en la pestaña Comunidades para empezar a gestionarla")
+                .foregroundColor(.blue)
+                .padding()
+          }
+      
         Button(action: {
           print("cerrando sesion")
           viewModel.logout()
