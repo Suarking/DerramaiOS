@@ -34,7 +34,7 @@ _No disponible en App Store_
 
 _Las herramientas utilizadas para la creación del proyecto son:_
 
-* [Android Studio]([https://developer.android.com/studio](https://apps.apple.com/es/app/xcode/id497799835?mt=12)) - IDE 
+* [Xcode](https://apps.apple.com/es/app/xcode/id497799835?mt=12) - IDE 
 * [Adobe Photoshop](https://www.adobe.com/es/creativecloud/plans.html?plan=individual&filter=all&promoid=PYPVPZQK&mv=other) - Editor de imagen, versión 23.1.0
 * [Vegas Pro](https://www.vegascreativesoftware.com/es/vegas-pro/) - Editor de vídeo , versión 19.0
 
